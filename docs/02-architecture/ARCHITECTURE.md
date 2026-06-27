@@ -35,6 +35,8 @@ SlimSAS/SFF-8654 cabling is used as a practical external transport method for PC
 
 The external PLX/PEX switch board is responsible for exposing two GPU endpoints to the host through a single upstream path.
 
+A PCIe switch is also important for keeping both GPUs under a predictable PCIe hierarchy, which improves the chance of stable CUDA Peer-to-Peer communication.
+
 ### 4. GPU module
 
 The external enclosure contains two Tesla P40 cards, water blocks, PCIe mechanical support, power wiring, and cooling loop components.
@@ -46,6 +48,31 @@ The GPU enclosure should provide independent 12 V power for both GPUs and auxili
 ### 6. Cooling subsystem
 
 Both Tesla P40 cards should be cooled by water blocks. The enclosure should include radiator, pump, reservoir, tubing, fittings, coolant, and airflow over VRM/backplate areas if required.
+
+## Multi-GPU memory model
+
+Tesla P40 does not support NVLink hardware bridges. Therefore, the project must treat multi-GPU VRAM as distributed memory connected through PCIe, not as one physical memory pool.
+
+Supported software approaches include:
+
+- CUDA Unified Memory
+- CUDA Peer-to-Peer access
+- NCCL communication
+- tensor parallelism
+- explicit layer/model splitting in inference frameworks
+
+See: [Multi-GPU Memory Sharing and Communication](MULTI_GPU_MEMORY.md)
+
+## Architecture options
+
+The project should be developed in stages:
+
+1. direct single-GPU PCIe testing
+2. adapter-chain MVP
+3. PCIe switch backplane
+4. integrated external AI compute chassis
+
+See: [External Multi-GPU Architecture Options](EXTERNAL_MULTI_GPU_OPTIONS.md)
 
 ## Design direction
 
